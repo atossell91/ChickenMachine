@@ -1,3 +1,92 @@
+* {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 body {
-    color: hotpink;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.displayArea {
+}
+
+.text {
+    border-radius: 25px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    width: 70%;
+    height: 100px;
+    resize: none;
+    padding: 5px;
+}
+
+.c-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color:rgb(13, 70, 177);
+    color: white;
+    width: 100%;
+}
+
+.c-button-area {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.c-nav-button {
+    margin: 5px 3px 5px 3px;
+}
+
+.c-title-img {
+    height: 10rem;
+    width: auto;
+}
+
+.c-update-button-space {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.c-notes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.note-area-title {
+    font-size: 16pt;
+}
+
+.note-area {
+    min-width: 50vw;
+}
+
+.input-items {
+    display: flex;
+    flex-direction: row;
+    flex-flow: row wrap;
+
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 1rem;
+    padding: 1rem;
+    margin: 1rem 0rem 1rem 0rem;
+
+    justify-content: center;
+}
+
+.input-item {
+    width: 10hw;
+    margin: 0px 5px 0px 5px;
+}
+
+.input-field {
+    width: 90%;
+    text-align: center;
 }

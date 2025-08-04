@@ -10,7 +10,6 @@ function onLoadDOM() {
         event.preventDefault();
         installPrompt = event;
         console.log("This PWA is installable!")
-        alert("Installable!"); // will now show
       }
     );
 
