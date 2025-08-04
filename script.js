@@ -177,7 +177,7 @@ function addButtons() {
 
 //  ****  For building the field areas  ****
 function createNoteArea(name, textId, text) {
-    const elemRoot = document.createElement("div");
+    const elemRoot = document.createElement("span");
     elemRoot.setAttribute("class", "note-area");
 
     const elemTitle = document.createElement("p");
