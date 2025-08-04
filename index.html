@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/picnic">
+    <link rel="manifest" href="/manifest.json">
+    <script src="setup.js"></script>
+    <style>
+        * {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .displayArea {
+        }
+
+        .text {
+            border-radius: 5px;
+            border-style: solid;
+            border-width: 2px;
+            border-color: black;
+            width: 70%;
+            height: 100px;
+            resize: none;
+            padding: 5px;
+        }
+
+        .note-area-title {
+            font-size: 16pt;
+        }
+
+        .input-items {
+            display: grid;
+            grid-template-columns: 17.5% 17.5% 17.5% 17.5%;
+        }
+
+        .input-item {
+            width: 100%;
+        }
+
+        .input-field {
+            width: 90%;
+            text-align: center;
+        }
+    </style>
+    <script>
+        const defaultLineSpeed = 91;
+        const modes = {
+            "home": {
+                "inputs": [
+                    {
+                        "label": "Date",
+                        "id": "date",
+                        "type": "date",
+                        "default": getTodaysDate()
+                    },
+                ],
+                "fields": [
+                    {
+                        "id": "weekNo",
+                        "label": "Current Week Number",
+                        "textFunction": () => {
+                            return getWeekNum();
+                        }
+                    },
+                    {
+                        "id": "cfiaOfficeAddr",
+                        "label": "CFIA Office Address",
+                        "textFunction": () => {
+                            return "2447 Townline Road, Abbotsford, V2T 6L6";
+                        }
+                    },
+                    {
+                        "id": "plantAddr",
+                        "label": "K&R's Address",
+                        "textFunction": () => {
+                            return "31171 Peardonville Road, Abbotsford, V2T 6K6";
+                        }
+                    },
+                    {
+                        "id": "plantPhone",
+                        "label": "K&R's Phone Number",
+                        "textFunction": () => {
+                            return "604-850-5808";
+                        }
+                    },
+                    {
+                        "id": "cvsEmail",
+                        "label": "CVS Worksheet e-mail address",
+                        "textFunction": () => { return "cfia.cvs-svc.acia@inspection.gc.ca"; }
+                    },
+                    //cfia.cvs-svc.acia@inspection.gc.ca545
+                    {
+                        "id": "cvsEmailText",
+                        "label": "CVS Email Text",
+                        "textFunction": () => {
+                            return "" +
+                            "Hello,\n\n" +
+                            "Please see the attached CVS data for fiscal week " +
+                            getWeekNum() + ".";
+                        }
+                    }
+                ]
+            },
+            "bleeding": {
+                "inputs": [],
+                "fields": [
+                    {
+                        "id": "documents",
+                        "label": "Document & Record Review",
+                        "textFunction": () => {
+                            const insp = document.getElementById("inspector").value;
+                            return getDate() + " at " + getTime() + ": " +
+                            "Reviewed the Record #24 (Daily Log-Op Live-end) for the DOA numbers for " +
+                            getProducerName() + "'s " + getSpeciesName() + "." +
+                            getInspectorName();
+                        }
+                    },
+                    {
+                        "id": "interviews",
+                        "label": "Interviews",
+                        "textFunction": () => {
+                            return getDate() + " at " + getTime(5) + ": " +
+                            " Interviewed live end supervisor, Mann." +
+                            getInspectorName();
+                        }
+                    },
+                    {
+                        "id": "observations",
+                        "label": "Observations",
+                        "textFunction": () => {
+                            return getDate() + " at " + getTime(7) + ": " +
+                            "Completed Stunning & Bleeding Inspection of "+
+                            getProducerName() + "'s " + getSpeciesName() +
+                            " at the Live-end. The Stickers were observed. No no compliances were observed." +
+                            getInspectorName();
+                        }
+                    }
+                ]
+            },
+            "antemortem": {
+                "inputs": [
+                    {
+                        "label": "Start Date",
+                        "id": "startDate",
+                        "type": "date",
+                        "default": getTodaysDate()
+                    },
+                    {
+                        "label": "Start Time",
+                        "id": "startTime",
+                        "type": "time",
+                        "default": "06:00"
+                    },
+                    {
+                        "label": "Bird Count",
+                        "id": "birdCount",
+                        "type": "number",
+                        "default": 6480
+                    },
+                    {
+                        "label": "Line Speed",
+                        "id": "lineSpeed",
+                        "type": "number",
+                        "default": defaultLineSpeed
+                    },
+                    {
+                        "label": "Last Food Date",
+                        "id": "lastFoodDate",
+                        "type": "date",
+                        "default": getYesterdaysDate()
+                    },
+                    {
+                        "label": "Last Food Time",
+                        "id": "lastFoodTime",
+                        "type": "time",
+                        "default": "20:00:00"
+                    },
+                    {
+                        "label": "Last Water Date",
+                        "id": "lastWaterDate",
+                        "type": "date",
+                        "default": getYesterdaysDate()
+                    },
+                    {
+                        "label": "Last Water Time",
+                        "id": "lastWaterTime",
+                        "type": "time",
+                        "default": "21:30:00"
+                    },
+                ],
+                "fields": [
+                    {
+                        "id": "documents",
+                        "label": "Document & Record Review",
+                        "textFunction": () => {
+                            return "Record #51 (Live End Receiving-Flock sheet) for " +
+                            getProducerName() + "'s " + getSpeciesName() +
+                            ", dated " + getDate() + "." + getInspectorName();
+                        }
+                    },
+                    {
+                        "id": "interviews",
+                        "label": "Interviews",
+                        "textFunction": () => {
+                            return getDate() + " at " + getTime() + ": " +
+                            "Interviewed live end supervisor, Mann." +
+                            getInspectorName();
+                        }
+                    },
+                    {
+                        "id": "observations",
+                        "label": "Observations",
+                        "textFunction": () => {
+                            return getDate() + " at " + getTime(2) + ": " +
+                            "Completed ante-mortem inspection on " +
+                            getProducerName() + "'s " + getSpeciesName() +
+                            ". Observed humane handling of birds by Live End " +
+                            "employees, from unloading crates from trucks up to " +
+                            "hanging of birds to shackles. No non-compliances were observed." +
+                            getInspectorName();
+                        }
+                    },
+                    {
+                        "id": "killTime",
+                        "label": "Kill End Time",
+                        "textFunction": () => {
+                            return getKillTime();
+                        }
+                    },
+                    {
+                        "id": "lastFoodPeriod",
+                        "label": "Time since last food",
+                        "textFunction": () => { return getTimeSinceFood(); }
+                    },
+                    {
+                        "id": "lastWaterPeriod",
+                        "label": "Time since last water",
+                        "textFunction": () => { return getTimeSinceWater(); }
+                    },
+                    {
+                        "id": "1102",
+                        "label": "1102 Declaration",
+                        "textFunction": () => {
+                            return "Inspector did not observe birds being loaded " +
+                            "in the farm or during transportation. Observed " +
+                            "humane handling at live end up to hanging of birds. " +
+                            "Reviewed the following documents: " +
+                            "Live Haul Transportation Report and Final Flock " +
+                            "Sheet for " + getProducerName() + "'s " +
+                            getSpeciesName() + " dated " + getDate() + ".";
+                        }
+                    },
+                    {
+                        "id": "1102Email",
+                        "label": "1102 Form e-mail address",
+                        "textFunction": () => { return "CVSHTID@inspection.gc.ca"; }
+                    },
+                    {
+                        "id": "1102EmailText",
+                        "label": "1102 Email Text",
+                        "textFunction": () => { 
+                            return "Hello" + "\n" +
+                            "Please see the attached 1102 for " +
+                            getProducerName() +"’s " +
+                            getSpeciesName() + ", " +
+                            "being processed at K&R poultry on " +
+                            getDate() + ".";
+                         }
+                    }
+                ]
+        }
+        }
+
+        function dateToSerial(date) {
+            return Date.UTC(
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate(),
+                date.getUTCHours(),
+                date.getUTCMinutes(),
+                date.getUTCSeconds()
+            );
+        }
+
+        function parseDateTime(dateStr, timeStr) {
+            return new Date(dateStr + " " + timeStr);
+        }
+
+        const d = new Date();
+        const s = dateToSerial(d);
+        const d2 = new Date(s);
+        //console.log("Date is: " + d2);
+
+        function getInspectorName() {
+            const name = document.getElementById("inspector").value;
+
+            if (name === "") {
+                return "";
+            }
+            else {
+                return " (" + name + ")";
+            }
+        }
+
+        function getSpeciesName() {
+            return document.getElementById("species").value;
+        }
+
+        function getProducerName() {
+            return document.getElementById("producer").value;
+        }
+
+        function getKillTime() {
+            const dateElem = document.getElementById("startDate");
+            const timeElem = document.getElementById("startTime");
+            const birdCountElem = document.getElementById("birdCount");
+            const lineSpeedElem = document.getElementById("lineSpeed");
+
+            const dateStr = dateElem.value;
+            const timeStr = timeElem.value;
+            const birdCountStr = birdCountElem.value;
+            const lineSpeedStr = lineSpeedElem.value;
+
+            const birdCount = parseInt(birdCountStr);
+            const lineSpeed = parseFloat(lineSpeedStr);
+
+            const mins = birdCount / (lineSpeed);
+            const totalMillis = mins * 60000;
+
+            const str = dateStr + " " + timeStr;
+
+            const date = new Date(str);
+
+            const utc = Date.UTC(
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate(),
+                date.getUTCHours(),
+                date.getUTCMinutes(),
+                date.getUTCSeconds()
+            );
+
+            const finalTime = utc + totalMillis;
+            const finalDate = new Date(finalTime);
+
+            return finalDate.getHours() + ":" + finalDate.getMinutes() + ":00";
+        }
+
+        function calcFwrTime(dateTimeStr) {
+
+
+            const today = new Date();
+            const todayDateStr = today.getFullYear() + "-" + (today.getMonth()+1) + "-" + today.getDate();
+
+            const killEndTimeStr = "07:20:00";
+
+            const killEnd = Date.parse(todayDateStr + " " + killEndTimeStr);
+
+            //console.log("DATE: " + todayDateStr)
+            //console.log("TIME: " + killEndTimeStr);
+
+            const hoursDelay = (killEnd - dateTimeStr)/(1000 * 60 * 60);
+
+            const roundedDelay = Math.round(hoursDelay * 100)/100;
+
+            return roundedDelay;
+        }
+
+        function getTimeSinceFood() {
+            const lastFoodDateElem = document.getElementById("lastFoodDate");
+            const lastFoodTimeElem = document.getElementById("lastFoodTime");
+
+            const lastFoodDateTime = Date.parse(lastFoodDateElem.value + " " + lastFoodTimeElem.value);
+
+            return calcFwrTime(lastFoodDateTime);
+        }
+
+        function getTimeSinceWater() {
+            const lastWaterDateElem = document.getElementById("lastWaterDate");
+            const lastWaterTimeElem = document.getElementById("lastWaterTime");
+
+            const lastWaterDateTime = Date.parse(lastWaterDateElem.value + " " + lastWaterTimeElem.value);
+
+            return calcFwrTime(lastWaterDateTime);
+        }
+
+        var currentMode = undefined;
+
+        function buildMode(modeName) {
+
+            const inputObjects = modes[modeName]["inputs"];
+            inputObjects.forEach((inputObj) => {
+                const elem = createEntryItem(inputObj["label"],
+                    createInputBox(inputObj["id"], inputObj["type"]), inputObj["default"]
+                );
+
+                modeInputRoot.appendChild(elem);
+            });
+
+            const fieldObjects = modes[modeName]["fields"];
+            fieldObjects.forEach((obj) => {
+                const elem = createNoteArea(obj["label"], obj["id"],
+                    obj["textFunction"]());
+
+                nodeRoot.appendChild(elem);
+            });
+        }
+
+        function murderChildren(node) {
+            while (node.childElementCount > 0) {
+                const child = node.children[0];
+                node.removeChild(child);
+            }
+        }
+
+        function updateMode(newMode) {
+            murderChildren(nodeRoot);
+            murderChildren(modeInputRoot);
+            buildMode(newMode);
+            currentMode = newMode;
+        }
+
+        function updateText() {
+            const objs = modes[currentMode]["fields"];
+
+            objs.forEach((obj) => {
+                //console.log("ID is " + obj["id"]);
+                const elem = document.getElementById(obj["id"]);
+                // .value used to be .innerText
+                elem.value = obj["textFunction"]();
+            });
+
+            //console.log("Text has been updated!");
+        }
+
+        const defaultBackground = "#FFFFFF";
+        const selectedBackground = "#BEFFBE";
+        const colourTimeout = 500;
+        const today = new Date();
+        
+        var nodeRoot = null;
+        var inputRoot = null;
+        var modeInputRoot = null;
+        
+        const dateTag = "#TODAY";
+        
+        const dayNames = [
+            "Monday", "Tuesday",
+            "Wednesday", "Thursday",
+            "Friday", "Saturday",
+            "Sunday"
+        ];
+        
+        const monthNames = [
+            "January", "February", "March",
+            "April", "May", "June",
+            "July", "August", "September",
+            "October", "November", "December"
+        ]
+        
+        function getTodaysDate() {
+            const today = new Date();
+            year = today.getFullYear();
+            monthNum = today.getMonth()+1;
+            dayNum = today.getDate();
+        
+            month = monthNum < 10 ? "0" + monthNum : monthNum;
+            day = dayNum < 10 ? "0" + dayNum : dayNum;
+
+            const dt = year + "-" + month + "-" + day;
+            return dt;
+        }
+
+        function getYesterdaysDate() {
+            const today = new Date();
+            const todaySerial = Date.UTC(
+                today.getFullYear(),
+                today.getMonth(),
+                today.getDate(),
+                today.getTimezoneOffset() / 60,
+                0,
+                0
+            )
+
+            const yesterdaySerial = todaySerial - 86400000;
+
+            const yestderday = new Date(yesterdaySerial);
+
+            //console.log(today);
+            //console.log(yestderday);
+
+            const yMonth = yestderday.getMonth() + 1;
+            const yDay = yestderday.getDate();
+
+            const monthStr = yMonth < 10 ? "0" + yMonth : yMonth;
+            const dayStr = yDay < 10 ? "0" + yDay : yDay;
+
+            return yestderday.getFullYear() + "-" + monthStr + "-" + dayStr;
+        }
+
+        function getDate() {
+            year = today.getFullYear();
+            month = today.getMonth();
+            monthName = monthNames[month];
+            day = today.getDate();
+            dayName = dayNames[today.getDay() - 1];
+        
+            return dayName + " " + monthName + " " + day + ", " + year;
+        }
+
+        function calcWeekNum(date) {
+            // Determine the year
+            const month = date.getMonth() + 1;
+
+            var year = date.getFullYear();
+            
+            if (month < 4) {
+                year = year - 1;
+            }
+
+            // Get the april first of the aforementioned year
+            const yearStart = new Date(year, 3, 1);
+
+            // Find the first monday of that year
+            var mondayDate = yearStart;
+
+            while (mondayDate.getDay() != 1) {
+                mondayDate.setTime( mondayDate.getTime() + 86400000);
+            }
+
+            // Calculate the number of weeks since that Monday
+            const weekNum = Math.round((date.getTime() - mondayDate.getTime()) / 604800000) +1;
+
+            return weekNum;
+        }
+
+        function getWeekNum() {
+            const dateStr = document.getElementById("date").value;
+            const date = new Date(dateStr);
+            return calcWeekNum(date);
+        }
+
+        function addMinutes(time, minutes) {
+            const newDate = new Date(time.getTime() + minutes * 60000);
+            return newDate;
+        }
+
+        function getTime(offset) {
+            const timeStr = document.getElementById("time").value;
+            const hr = parseInt(timeStr.substring(0,2));
+            const min = parseInt(timeStr.substring(3,5));
+
+            //console.log(hr);
+            //console.log(min);
+
+            const time = new Date(today.getFullYear(), today.getMonth(), today.getDay( ),
+            hr, min);
+
+            const minNum = time.getMinutes();
+            let minStr = minNum + "";
+            if (minNum < 10) {
+                minStr = "0" + minNum;
+            }
+            
+            if (offset === undefined) {
+                return time.getHours() + ":" + minStr;
+            }
+            else {
+                const d = addMinutes(time, offset);
+                return d.getHours() + ":" + minStr;
+            }
+        }
+        
+        function setClipboard(elem) {
+            if (elem === null) return;
+        
+            elem.style.background = selectedBackground;
+        
+            setTimeout(() => {
+                elem.style.background = defaultBackground;
+            }, colourTimeout);
+        
+            text = elem.value;
+            navigator.clipboard.writeText(text);
+        }
+        
+        //  ****  For creating the input area  ****
+        function createInputBox(id, typeStr, changeFunc) {
+            const box = document.createElement("input");
+            box.setAttribute("class", "input-box");
+            box.setAttribute("type", typeStr);
+            box.setAttribute("id", id);
+        
+            if (changeFunc !== undefined && changeFunc !== "") {
+                box.setAttribute("onchange", changeFunc);
+            }
+        
+            return box;
+        }
+
+        function createDropdownMenu(id, options) {
+            const box = document.createElement("select");
+            box.setAttribute("id", id);
+
+            options.forEach((option) => {
+                const optionBox = document.createElement("option");
+                optionBox.setAttribute("value", option["value"]);
+                optionBox.innerText = option["name"];
+                box.appendChild(optionBox);
+            });
+
+            return box;
+        }
+        
+        function createEntryItem(label, entryElement, defaultVal) {
+            const root = document.createElement("div");
+            root.setAttribute("class", "input-item");
+        
+            const lbl = document.createElement("p");
+            lbl.innerText = label;
+
+            if (defaultVal !== undefined) {
+                entryElement.value = defaultVal;
+                entryElement.setAttribute("class", "input-field");
+            }
+        
+            root.appendChild(lbl);
+            root.appendChild(entryElement);
+        
+            return root;
+        }
+        
+        function buildEntryFields() {
+            if (inputRoot === null) return;
+        
+            const children = [
+                createEntryItem("Time", createInputBox("time", "time")),
+                createEntryItem("Producer", createInputBox("producer", "text")),
+                createEntryItem("Species", createDropdownMenu("species", [
+                    {
+                        "name": "Broiler Chickens",
+                        "value": "Broiler Chickens"
+                    },
+                    {
+                        "name": "Roaster Chickens",
+                        "value": "Roaster Chickens"
+                    },
+                    {
+                        "name": "Ducks",
+                        "value": "Ducks"
+                    },
+                    {
+                        "name": "Silkie Chickens",
+                        "value": "Silkie Chickens"
+                    },
+                    {
+                        "name": "Heavy Fowl",
+                        "value": "Heavy Fowl"
+                    },
+                    {
+                        "name": "Taiwanese Chickens",
+                        "value": "Taiwanese Chickens"
+                    },
+                    {
+                        "name": "Cornish Chickens",
+                        "value": "Cornish Chickens"
+                    }
+                ])),
+                createEntryItem("Inspector", createInputBox("inspector", "text")),
+            ];
+
+            children.forEach((child) => {
+                inputRoot.appendChild(child);
+            });
+        
+            document.getElementById("time").value = "05:45";
+        }
+
+        function createPageButton(name) {
+            const button = document.createElement("button");
+            button.innerText = name;
+
+            const attrText = "updateMode('" + name + "')";
+            button.setAttribute("onclick", attrText);
+            return button;
+        }
+
+        function addButtons() {
+            var btns = document.getElementById("buttons");
+
+            for (let modeName in modes) {
+                console.log(modeName);
+
+                const button = createPageButton(modeName);
+
+                btns.appendChild(button);
+            }
+        }
+        
+        //  ****  For building the field areas  ****
+        function createNoteArea(name, textId, text) {
+            const elemRoot = document.createElement("div");
+            elemRoot.setAttribute("class", "note-area");
+        
+            const elemTitle = document.createElement("p");
+            elemTitle.setAttribute("class", "note-area-title");
+            elemTitle.innerText = name;
+        
+            const elem = document.createElement("textarea");
+            elem.setAttribute("class", "text");
+            elem.setAttribute("onclick","setClipboard(this)");
+            elem.setAttribute("id", textId);
+            // Was innerText - change it back if it acts weird
+            elem.value = text;
+        
+            elemRoot.appendChild(elemTitle);
+            elemRoot.appendChild(elem);
+        
+            return elemRoot;
+        }
+        
+        //  ****  Event listeners  ****
+        addEventListener("DOMContentLoaded", () => {
+            nodeRoot = document.getElementById("notes");
+            inputRoot = document.getElementById("inputItems");
+            modeInputRoot = document.getElementById("mode-input-items");
+
+            addButtons();
+
+            buildEntryFields();
+            updateMode("home");
+        });
+        
+    </script>
+    <title>Document</title>
+</head>
+<body>
+    <div class="displayArea">
+        <div id="buttons"></div>
+        <br>
+        <div class="region">
+            <div class="input-items" id="inputItems">
+            </div>
+        </div>
+        <div>
+            <div class="input-items" id="mode-input-items">
+            </div>
+        </div>
+        <button onclick="updateText()">Update!</button>
+        <div class="region">
+            <div id="notes">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
