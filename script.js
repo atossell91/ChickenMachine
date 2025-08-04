@@ -56,7 +56,6 @@ function updateText() {
 const defaultBackground = "#FFFFFF";
 const selectedBackground = "#BEFFBE";
 const colourTimeout = 500;
-const today = new Date();
 
 var nodeRoot = null;
 var inputRoot = null;

@@ -1,3 +1,6 @@
+
+const today = new Date();
+
 function dateToSerial(date) {
     return Date.UTC(
         date.getFullYear(),
@@ -174,6 +177,7 @@ function getDate() {
     day = today.getDate();
     dayName = dayNames[today.getDay() - 1];
 
+    // Dayname is undefined below - why?
     return dayName + " " + monthName + " " + day + ", " + year;
 }
 
